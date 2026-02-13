@@ -1,14 +1,14 @@
 {
-    "name": "Salon Management System",
-    "short_name": "SalonApp",
+    "name": "Book Service",
+    "short_name": "Book Service",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#111827",
     "icons": [
         {
-            "src": "https://base44.com/logo_v2.svg",
-            "sizes": "192x192",
+            "src": "/favicon.svg",
+            "sizes": "any",
             "type": "image/svg+xml"
         }
     ]
