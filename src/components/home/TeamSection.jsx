@@ -21,6 +21,20 @@ const team = [
         bio: 'Known for warm client care, creative colour blends, and precision finishing touches.',
         image: '/images/hannah.png'
     }
+    ,
+    {
+        name: 'Lily Carmody',
+        role: 'Senior Stylist',
+        bio: 'Specialises in modern cuts and bespoke colouring with a gentle touch.',
+        image: '/images/lily.png'
+    }
+    ,
+    {
+        name: 'Eilish Beckett',
+        role: 'Stylist & Colourist',
+        bio: 'Expert in lived-in colour, balayage, and personalised styling.',
+        image: '/images/eilish.png'
+    }
 ];
 
 export default function TeamSection() {

@@ -1,9 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion } from 'framer-motion';
+import { getUserLocationFromIP, findNearestSalon } from '@/lib/nearest-salon';
 
 export default function IntroSection() {
+  const [nearestSalon, setNearestSalon] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const findSalon = async () => {
+      try {
+        // Get salons data
+        const salonsResponse = await fetch('/data/salons.json');
+        const salons = await salonsResponse.json();
+        
+        // Get user location from IP
+        const location = await getUserLocationFromIP();
+        
+        if (location && location.latitude && location.longitude) {
+          const nearest = findNearestSalon(location.latitude, location.longitude, salons);
+          setNearestSalon(nearest);
+        }
+      } catch (error) {
+        console.error('Error finding nearest salon:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    findSalon();
+  }, []);
+
   return (
     <section className="py-24 md:py-32 px-6">
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
@@ -26,6 +54,36 @@ export default function IntroSection() {
           <p className="text-neutral-600 leading-relaxed mb-10">
             We believe in not just enhancing your hair but also in nurturing its health and vitality. This is why we use Kevin Murphy for low-toxicity colour products — stunning results while ensuring the utmost care for your hair and scalp.
           </p>
+
+          {/* Nearest Salon Info */}
+          {!loading && nearestSalon && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="bg-neutral-50 p-6 rounded-lg mb-10 border border-neutral-200"
+            >
+              <p className="text-[11px] tracking-[0.3em] uppercase text-neutral-400 mb-2">
+                Your Nearest Salon
+              </p>
+              <h3 className="font-serif text-xl text-neutral-900 mb-2">{nearestSalon.name}</h3>
+              <p className="text-neutral-600 text-sm mb-1">
+                📍 {nearestSalon.address}, {nearestSalon.state} {nearestSalon.postcode}
+              </p>
+              <p className="text-neutral-500 text-xs">
+                Approximately {nearestSalon.distance} km away
+              </p>
+              {nearestSalon.phone && (
+                <p className="text-neutral-600 text-sm mt-2">
+                  📞 {nearestSalon.phone}
+                </p>
+              )}
+              <p className="text-neutral-500 text-xs mt-3 italic">
+                💇‍♀️ Our stylists also offer at-home services. Contact your local salon for availability and booking.
+              </p>
+            </motion.div>
+          )}
+
           <Link
             to={createPageUrl('Bookings')}
             className="inline-block bg-neutral-900 text-white px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-800 transition-all duration-300"
