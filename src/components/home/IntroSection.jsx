@@ -70,51 +70,22 @@ export default function IntroSection() {
             We believe in not just enhancing your hair but also in nurturing its health and vitality. This is why we use Kevin Murphy for low-toxicity colour products — stunning results while ensuring the utmost care for your hair and scalp.
           </p>
 
-          {/* Nearest Salon Info */}
-          {!loading && nearestSalon && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="bg-neutral-50 p-6 rounded-lg mb-10 border border-neutral-200"
+          <div className="flex flex-col md:flex-row gap-4">
+            <Link
+              to={createPageUrl('Bookings')}
+              className="inline-block bg-neutral-900 text-white px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-800 transition-all duration-300"
             >
-              <p className="text-[11px] tracking-[0.3em] uppercase text-neutral-400 mb-2">
-                Your Nearest Salon
-              </p>
-              <h3 className="font-serif text-xl text-neutral-900 mb-2">
-                The Salon Edit (formerly {nearestSalon.name})
-              </h3>
-              <p className="text-neutral-600 text-sm mb-4">
-                📍 {nearestSalon.address}, {nearestSalon.state} {nearestSalon.postcode}
-              </p>
-              <p className="text-neutral-600 text-sm leading-relaxed mb-4">
-                We've transformed this location by adding expert stylists, redesigning the space, and introducing our signature low-toxicity services to better serve you.
-              </p>
-              {nearestSalon.phone && (
-                <p className="text-neutral-600 text-sm mb-3">
-                  📞 {nearestSalon.phone}
-                </p>
-              )}
-              <p className="text-neutral-500 text-xs italic">
-                💇‍♀️ Our stylists also offer at-home services. Contact your local salon for availability and booking.
-              </p>
-            </motion.div>
-          )}
+              Book Now
+            </Link>
 
-          <Link
-            to={createPageUrl('Bookings')}
-            className="inline-block bg-neutral-900 text-white px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-800 transition-all duration-300"
-          >
-            Book Now
-          </Link>
-
-          <button
-            onClick={handleWhereLocatedClick}
-            disabled={manualLoading}
-            className="inline-block ml-4 bg-neutral-200 text-neutral-900 px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {manualLoading ? 'Locating...' : 'Where are we located'}
-          </button>
+            <button
+              onClick={handleWhereLocatedClick}
+              disabled={manualLoading}
+              className="inline-block bg-neutral-200 text-neutral-900 px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Where are we located
+            </button>
+          </div>
 
           {/* Manual Location Result */}
           {showManualResult && nearestSalon && (

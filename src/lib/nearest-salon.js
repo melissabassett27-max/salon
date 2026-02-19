@@ -49,15 +49,37 @@ export function findNearestSalon(userLat, userLon, salons) {
  */
 export async function getUserLocationFromIP() {
   try {
-    const response = await fetch('/.netlify/functions/whoami');
+    // Try Netlify function first (works on production)
+    try {
+      const response = await fetch('/.netlify/functions/whoami', { timeout: 3000 });
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          city: data.city,
+          region: data.region,
+          country: data.country,
+        };
+      }
+    } catch (netlifyError) {
+      // Fallback: use ipapi.co directly (works everywhere)
+      console.log('Netlify function not available, using fallback API');
+    }
+
+    // Fallback to direct API call
+    const response = await fetch('https://ipapi.co/json/', {
+      headers: { 'Accept': 'application/json' }
+    });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
     const data = await response.json();
     return {
       latitude: data.latitude,
       longitude: data.longitude,
       city: data.city,
       region: data.region,
-      country: data.country,
+      country: data.country_name,
     };
   } catch (error) {
     console.error('Error fetching user location:', error);
