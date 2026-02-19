@@ -66,19 +66,21 @@ export default function IntroSection() {
               <p className="text-[11px] tracking-[0.3em] uppercase text-neutral-400 mb-2">
                 Your Nearest Salon
               </p>
-              <h3 className="font-serif text-xl text-neutral-900 mb-2">{nearestSalon.name}</h3>
-              <p className="text-neutral-600 text-sm mb-1">
+              <h3 className="font-serif text-xl text-neutral-900 mb-2">
+                The Salon Edit (formerly {nearestSalon.name})
+              </h3>
+              <p className="text-neutral-600 text-sm mb-4">
                 📍 {nearestSalon.address}, {nearestSalon.state} {nearestSalon.postcode}
               </p>
-              <p className="text-neutral-500 text-xs">
-                Approximately {nearestSalon.distance} km away
+              <p className="text-neutral-600 text-sm leading-relaxed mb-4">
+                We've transformed this location by adding expert stylists, redesigning the space, and introducing our signature low-toxicity services to better serve you.
               </p>
               {nearestSalon.phone && (
-                <p className="text-neutral-600 text-sm mt-2">
+                <p className="text-neutral-600 text-sm mb-3">
                   📞 {nearestSalon.phone}
                 </p>
               )}
-              <p className="text-neutral-500 text-xs mt-3 italic">
+              <p className="text-neutral-500 text-xs italic">
                 💇‍♀️ Our stylists also offer at-home services. Contact your local salon for availability and booking.
               </p>
             </motion.div>
