@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { listServices } from '@/lib/data-loader';
 import { motion } from 'framer-motion';
@@ -22,6 +22,14 @@ export default function Bookings() {
         notes: '',
     });
     const [submitted, setSubmitted] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState(null);
+
+    useEffect(() => {
+        const saved = localStorage.getItem('selectedSalonLocation');
+        if (saved) {
+            setSelectedLocation(JSON.parse(saved));
+        }
+    }, []);
 
     const { data: services = [] } = useQuery({
         queryKey: ['services'],
@@ -42,6 +50,10 @@ export default function Bookings() {
             `Preferred Stylist: ${form.preferred_stylist}`,
             `Preferred Date: ${form.preferred_date}`,
             `Preferred Time: ${form.preferred_time || 'Not specified'}`,
+            ...(selectedLocation ? [
+                `Preferred Location: The Salon Edit (formerly ${selectedLocation.name})`,
+                `Location Address: ${selectedLocation.address}, ${selectedLocation.state} ${selectedLocation.postcode}`,
+            ] : []),
             `Notes: ${form.notes || 'None'}`,
         ];
         const message = lines.join('\n');
@@ -121,6 +133,30 @@ export default function Bookings() {
                             </motion.div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-6">
+                                {/* Selected Location Display */}
+                                {selectedLocation && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="bg-green-50 p-6 rounded-lg border border-green-200 mb-6"
+                                    >
+                                        <p className="text-[11px] tracking-[0.3em] uppercase text-green-700 mb-2">
+                                            📍 Your Selected Location
+                                        </p>
+                                        <h3 className="font-serif text-lg text-neutral-900 mb-2">
+                                            The Salon Edit (formerly {selectedLocation.name})
+                                        </h3>
+                                        <p className="text-neutral-600 text-sm mb-1">
+                                            {selectedLocation.address}, {selectedLocation.state} {selectedLocation.postcode}
+                                        </p>
+                                        {selectedLocation.phone && (
+                                            <p className="text-neutral-600 text-sm">
+                                                📞 {selectedLocation.phone}
+                                            </p>
+                                        )}
+                                    </motion.div>
+                                )}
+
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <Label className="text-[11px] tracking-[0.15em] uppercase text-neutral-500">Full Name *</Label>

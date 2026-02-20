@@ -4,6 +4,7 @@ import { createPageUrl } from '@/utils';
 import { motion } from 'framer-motion';
 import { getUserLocationFromIP, findNearestSalon } from '@/lib/nearest-salon';
 import SalonQnASection from '../SalonQnASection';
+import SearchLocations from '../SearchLocations';
 
 export default function IntroSection() {
   const [nearestSalon, setNearestSalon] = useState(null);
@@ -154,6 +155,13 @@ export default function IntroSection() {
           </div>
           <div className="absolute -bottom-6 -left-6 w-32 h-32 border border-neutral-200 -z-10" />
         </motion.div>
+      </div>
+
+      {/* Search Locations Section */}
+      <div className="mt-24 md:mt-32 px-6">
+        <div className="max-w-6xl mx-auto">
+          <SearchLocations />
+        </div>
       </div>
     </section>
   );
