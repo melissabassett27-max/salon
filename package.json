@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
+        "dev:5155": "vite --port 5155",
         "build": "vite build",
         "lint": "eslint . --quiet",
         "lint:fix": "eslint . --fix",
