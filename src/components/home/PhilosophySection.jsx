@@ -64,32 +64,7 @@ export default function PhilosophySection() {
             To keep your strands looking and feeling their best, we use the best. We want to raise the bar for salon services.
           </p>
 
-          {/* Nearest Salon Brief Info */}
-          {nearestSalon && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="bg-white p-8 rounded-lg border border-neutral-200 max-w-lg mx-auto mb-16"
-            >
-              <h3 className="font-serif text-xl text-neutral-900 mb-2">
-                The Salon Edit (formerly {nearestSalon.name})
-              </h3>
-              <p className="text-neutral-600 text-sm mb-4">
-                📍 {nearestSalon.address}, {nearestSalon.state} {nearestSalon.postcode}
-              </p>
-              <p className="text-neutral-500 text-sm leading-relaxed">
-                Experience the philosophy in action at your nearest location.
-              </p>
-            </motion.div>
-          )}
-
-          {/* Q&A Section - When no salon found */}
-          {!nearestSalon && (
-            <div className="mb-16">
-              <SalonQnASection />
-            </div>
-          )}
+          {/* (Removed duplicate nearest-salon / Q&A block as requested) */}
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">

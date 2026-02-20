@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const questions = [
@@ -15,6 +15,40 @@ const questions = [
 export default function SalonQnASection() {
   const [selected, setSelected] = useState([]);
 
+  const [suburbs, setSuburbs] = useState([]);
+  const [suburbQuery, setSuburbQuery] = useState('');
+  const [showSuburbDropdown, setShowSuburbDropdown] = useState(false);
+  const [selectedSuburb, setSelectedSuburb] = useState('');
+
+  useEffect(() => {
+    const loadSuburbs = async () => {
+      try {
+        // Try full suburbs list first (if you add public/data/australia_suburbs.json)
+        try {
+          const full = await fetch('/data/australia_suburbs.json');
+          if (full.ok) {
+            const fullData = await full.json();
+            if (Array.isArray(fullData) && fullData.length > 0) {
+              setSuburbs(fullData.sort());
+              return;
+            }
+          }
+        } catch (err) {
+          // ignore and fallback
+        }
+
+        // Fallback: extract suburbs from salons.json (salons dataset)
+        const res = await fetch('/data/salons.json');
+        const data = await res.json();
+        const unique = [...new Set(data.map((s) => s.suburb).filter(Boolean))].sort();
+        setSuburbs(unique);
+      } catch (e) {
+        console.error('Failed to load suburbs for QnA', e);
+      }
+    };
+    loadSuburbs();
+  }, []);
+
   const toggleQuestion = (index) => {
     setSelected((prev) =>
       prev.includes(index)
@@ -27,14 +61,14 @@ export default function SalonQnASection() {
     if (selected.length === 0) return;
 
     const selectedQuestions = selected.map((i) => questions[i]).join('\n• ');
-    const message = encodeURIComponent(
-      `Hi, I have the following questions:\n\n• ${selectedQuestions}\n\nPlease help me with answers. Thank you!`
-    );
+    let body = `Hi, I have the following questions:\n\n• ${selectedQuestions}`;
+    if (selectedSuburb) {
+      body += `\n\nSuburb: ${selectedSuburb}`;
+    }
+    body += `\n\nPlease help me with answers. Thank you!`;
+    const message = encodeURIComponent(body);
 
-    window.open(
-      `https://wa.me/?text=${message}`,
-      '_blank'
-    );
+    window.open(`https://wa.me/?text=${message}`, '_blank');
   };
 
   return (
@@ -69,6 +103,36 @@ export default function SalonQnASection() {
           </label>
         ))}
       </div>
+
+      {/* Suburb selector shown when 'Where are you located' is selected */}
+      {selected.includes(2) && (
+        <div className="mb-6">
+          <label className="block text-sm text-neutral-600 mb-2">Select your suburb</label>
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search or type suburb..."
+              value={suburbQuery}
+              onChange={(e) => { setSuburbQuery(e.target.value); setShowSuburbDropdown(true); }}
+              onFocus={() => setShowSuburbDropdown(true)}
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900"
+            />
+            {showSuburbDropdown && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-lg shadow-lg max-h-48 overflow-y-auto z-10">
+                {suburbs.filter(s => s.toLowerCase().includes(suburbQuery.toLowerCase())).map((suburb) => (
+                  <button
+                    key={suburb}
+                    onClick={() => { setSelectedSuburb(suburb); setSuburbQuery(suburb); setShowSuburbDropdown(false); }}
+                    className="w-full text-left px-4 py-2 hover:bg-neutral-50 text-sm"
+                  >
+                    {suburb}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <button
         onClick={handleGetAnswers}
