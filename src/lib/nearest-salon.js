@@ -44,45 +44,74 @@ export function findNearestSalon(userLat, userLon, salons) {
 }
 
 /**
- * Get user's location via IP geolocation (no browser permission needed)
+ * Advanced location fetching with retry logic and multiple fallbacks
+ * @param {number} maxRetries - Maximum retry attempts
  * @returns {Promise<Object>} Object with latitude, longitude, city, region
  */
-export async function getUserLocationFromIP() {
-  try {
-    // Try Netlify function first (works on production)
-    try {
-      const response = await fetch('/.netlify/functions/whoami', { timeout: 3000 });
-      if (response.ok) {
-        const data = await response.json();
-        return {
-          latitude: data.latitude,
-          longitude: data.longitude,
-          city: data.city,
-          region: data.region,
-          country: data.country,
-        };
+export async function getUserLocationFromIP(maxRetries = 3) {
+  const apis = [
+    {
+      name: 'Netlify',
+      fetch: () => fetch('/.netlify/functions/whoami', { timeout: 2000 }),
+      parse: (data) => ({
+        latitude: data.latitude,
+        longitude: data.longitude,
+        city: data.city,
+        region: data.region,
+        country: data.country,
+      }),
+    },
+    {
+      name: 'ipapi.co',
+      fetch: () =>
+        fetch('https://ipapi.co/json/', {
+          headers: { Accept: 'application/json' },
+          timeout: 3000,
+        }),
+      parse: (data) => ({
+        latitude: data.latitude,
+        longitude: data.longitude,
+        city: data.city,
+        region: data.region,
+        country: data.country_name,
+      }),
+    },
+    {
+      name: 'ip-api.com',
+      fetch: () =>
+        fetch('http://ip-api.com/json/', { timeout: 3000 }),
+      parse: (data) => ({
+        latitude: data.lat,
+        longitude: data.lon,
+        city: data.city,
+        region: data.regionName,
+        country: data.country,
+      }),
+    },
+  ];
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    for (const api of apis) {
+      try {
+        const response = await api.fetch();
+        if (response.ok) {
+          const data = await response.json();
+          if (data.latitude && data.longitude) {
+            console.log(`✓ Location loaded via ${api.name}`);
+            return api.parse(data);
+          }
+        }
+      } catch (error) {
+        console.log(`✗ ${api.name} attempt ${attempt + 1} failed:`, error.message);
       }
-    } catch (netlifyError) {
-      // Fallback: use ipapi.co directly (works everywhere)
-      console.log('Netlify function not available, using fallback API');
     }
 
-    // Fallback to direct API call
-    const response = await fetch('https://ipapi.co/json/', {
-      headers: { 'Accept': 'application/json' }
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    
-    const data = await response.json();
-    return {
-      latitude: data.latitude,
-      longitude: data.longitude,
-      city: data.city,
-      region: data.region,
-      country: data.country_name,
-    };
-  } catch (error) {
-    console.error('Error fetching user location:', error);
-    return null;
+    // Wait before retrying (exponential backoff)
+    if (attempt < maxRetries - 1) {
+      await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+    }
   }
+
+  console.warn('⚠ All location APIs failed after retries');
+  return null;
 }

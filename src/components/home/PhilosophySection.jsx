@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Leaf, Heart, Sparkles } from 'lucide-react';
+import { getUserLocationFromIP, findNearestSalon } from '@/lib/nearest-salon';
 
 const pillars = [
   {
@@ -21,6 +22,28 @@ const pillars = [
 ];
 
 export default function PhilosophySection() {
+  const [nearestSalon, setNearestSalon] = useState(null);
+
+  useEffect(() => {
+    const findSalon = async () => {
+      try {
+        const salonsResponse = await fetch('/data/salons.json');
+        const salons = await salonsResponse.json();
+        
+        const location = await getUserLocationFromIP();
+        
+        if (location && location.latitude && location.longitude) {
+          const nearest = findNearestSalon(location.latitude, location.longitude, salons);
+          setNearestSalon(nearest);
+        }
+      } catch (error) {
+        console.error('Error finding nearest salon:', error);
+      }
+    };
+
+    findSalon();
+  }, []);
+
   return (
     <section className="py-24 md:py-32 bg-[#f8f7f5]">
       <div className="max-w-6xl mx-auto px-6 text-center">
@@ -39,6 +62,26 @@ export default function PhilosophySection() {
           <p className="text-neutral-500 max-w-2xl mx-auto mb-16 leading-relaxed">
             To keep your strands looking and feeling their best, we use the best. We want to raise the bar for salon services.
           </p>
+
+          {/* Nearest Salon Brief Info */}
+          {nearestSalon && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="bg-white p-8 rounded-lg border border-neutral-200 max-w-lg mx-auto mb-16"
+            >
+              <h3 className="font-serif text-xl text-neutral-900 mb-2">
+                The Salon Edit (formerly {nearestSalon.name})
+              </h3>
+              <p className="text-neutral-600 text-sm mb-4">
+                📍 {nearestSalon.address}, {nearestSalon.state} {nearestSalon.postcode}
+              </p>
+              <p className="text-neutral-500 text-sm leading-relaxed">
+                Experience the philosophy in action at your nearest location.
+              </p>
+            </motion.div>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
@@ -61,5 +104,7 @@ export default function PhilosophySection() {
         </div>
       </div>
     </section>
+  );
+}
   );
 }

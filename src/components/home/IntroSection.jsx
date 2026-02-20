@@ -6,7 +6,7 @@ import { getUserLocationFromIP, findNearestSalon } from '@/lib/nearest-salon';
 
 export default function IntroSection() {
   const [nearestSalon, setNearestSalon] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [manualLoading, setManualLoading] = useState(false);
   const [showManualResult, setShowManualResult] = useState(false);
 
@@ -32,7 +32,7 @@ export default function IntroSection() {
   useEffect(() => {
     const initSalon = async () => {
       await fetchNearestSalon();
-      setLoading(false);
+      setInitialLoading(false);
     };
     initSalon();
   }, []);
@@ -40,6 +40,7 @@ export default function IntroSection() {
   const handleWhereLocatedClick = async () => {
     setManualLoading(true);
     setShowManualResult(false);
+    await new Promise(r => setTimeout(r, 1000)); // simulate loading UI
     const result = await fetchNearestSalon();
     setManualLoading(false);
     if (result) {
@@ -78,13 +79,22 @@ export default function IntroSection() {
               Book Now
             </Link>
 
-            <button
-              onClick={handleWhereLocatedClick}
-              disabled={manualLoading}
-              className="inline-block bg-neutral-200 text-neutral-900 px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Where are we located
-            </button>
+            {!initialLoading && nearestSalon && (
+              <button
+                onClick={handleWhereLocatedClick}
+                disabled={manualLoading}
+                className="bg-neutral-200 text-neutral-900 px-10 py-4 text-[11px] tracking-[0.25em] uppercase font-medium hover:bg-neutral-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {manualLoading ? (
+                  <>
+                    <span className="inline-block animate-spin">⏳</span>
+                    Loading
+                  </>
+                ) : (
+                  'Where are we located'
+                )}
+              </button>
+            )}
           </div>
 
           {/* Manual Location Result */}
