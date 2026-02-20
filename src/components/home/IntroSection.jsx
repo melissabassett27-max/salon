@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { motion } from 'framer-motion';
 import { getUserLocationFromIP, findNearestSalon } from '@/lib/nearest-salon';
+import SalonQnASection from '../SalonQnASection';
 
 export default function IntroSection() {
   const [nearestSalon, setNearestSalon] = useState(null);
@@ -96,6 +97,13 @@ export default function IntroSection() {
               </button>
             )}
           </div>
+
+          {/* Q&A Section - When no salon found */}
+          {!initialLoading && !nearestSalon && (
+            <div className="mt-12">
+              <SalonQnASection />
+            </div>
+          )}
 
           {/* Manual Location Result */}
           {showManualResult && nearestSalon && (

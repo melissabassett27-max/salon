@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Leaf, Heart, Sparkles } from 'lucide-react';
 import { getUserLocationFromIP, findNearestSalon } from '@/lib/nearest-salon';
+import SalonQnASection from '../SalonQnASection';
 
 const pillars = [
   {
@@ -81,6 +82,13 @@ export default function PhilosophySection() {
                 Experience the philosophy in action at your nearest location.
               </p>
             </motion.div>
+          )}
+
+          {/* Q&A Section - When no salon found */}
+          {!nearestSalon && (
+            <div className="mb-16">
+              <SalonQnASection />
+            </div>
           )}
         </motion.div>
 

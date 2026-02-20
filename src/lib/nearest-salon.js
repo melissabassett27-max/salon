@@ -20,9 +20,10 @@ function haversine(lat1, lon1, lat2, lon2) {
  * @param {number} userLat - User's latitude
  * @param {number} userLon - User's longitude
  * @param {Array} salons - Array of salon objects (must have lat, lon)
- * @returns {Object} Nearest salon with distance, or null
+ * @param {number} maxDistance - Maximum distance in km to show salon (default 35km)
+ * @returns {Object} Nearest salon with distance, or null if exceeds maxDistance
  */
-export function findNearestSalon(userLat, userLon, salons) {
+export function findNearestSalon(userLat, userLon, salons, maxDistance = 35) {
   if (!userLat || !userLon || !Array.isArray(salons) || salons.length === 0) {
     return null;
   }
@@ -40,7 +41,12 @@ export function findNearestSalon(userLat, userLon, salons) {
     }
   }
 
-  return nearest;
+  // Only return salon if within max distance threshold
+  if (nearest && minDistance <= maxDistance) {
+    return nearest;
+  }
+
+  return null;
 }
 
 /**
